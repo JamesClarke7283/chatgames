@@ -20,45 +20,52 @@ end
 chatgames.register_game("Unscramble", chatgames.answer_func)
 chatgames.register_game("Write Out Words", chatgames.answer_func)
 -- Scramble function
--- Scramble function
 local function scramble(str)
     local words = {}
     for word in str:gmatch("%S+") do
-        -- Convert each word to title case
-        word = word:sub(1,1):upper() .. word:sub(2):lower()
-
-        -- Convert the word into a table of characters
+        -- Convert the word into a table of characters, excluding non-alphabetic characters
         local chars = {}
-        for char in word:gmatch(".") do
+        for char in word:gmatch("%a") do
             table.insert(chars, char)
         end
 
         -- Scramble the characters in the word with fewer swaps
-        local swap_times = math.floor(#chars / 2) -- Limiting the number of swaps
+        local swap_times = math.floor(#chars / 2)
         for _ = 1, swap_times do
             local i = math.random(#chars)
             local j = math.random(#chars)
             chars[i], chars[j] = chars[j], chars[i]
         end
 
-        -- Reassemble the word and add it to the list
-        words[#words + 1] = table.concat(chars)
+        -- Reinsert non-alphabetic characters into their original positions
+        local scrambled_word = ""
+        local char_index = 1
+        for i = 1, #word do
+            if word:sub(i,i):match("%a") then
+                scrambled_word = scrambled_word .. chars[char_index]
+                char_index = char_index + 1
+            else
+                scrambled_word = scrambled_word .. word:sub(i,i)
+            end
+        end
+
+        words[#words + 1] = scrambled_word
     end
 
     -- Return the scrambled sentence
     return table.concat(words, " ")
 end
 
+
 -- Generate questions from registered items
 for item_name, item_def in pairs(minetest.registered_items) do
     -- Use the description field as the human-readable name
-    local human_readable_name = item_def.description
-    minetest.log("action", "[chatgames] human-readable name: " .. human_readable_name)
-
+    local human_readable_name = ItemStack(item_name):get_short_description()
 
     if human_readable_name and human_readable_name ~= "" then
+        minetest.log("action", "[chatgames] human-readable name: " .. human_readable_name)
         -- Remove colons and replace underscores with spaces
-        human_readable_name = clean_human_readable_name(human_readable_name)
+        --human_readable_name = clean_human_readable_name(human_readable_name)
         minetest.log("action", "[chatgames] Cleaned human-readable name: " .. human_readable_name)
 
         -- Register question for "Write Out Words" game

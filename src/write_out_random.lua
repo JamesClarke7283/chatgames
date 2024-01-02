@@ -1,6 +1,8 @@
+
 chatgames.register_game("Write Out Random", chatgames.answer_func)
 
 -- Generate questions from random letters and numbers 1-16 characters.
+--[[
 for i = 1, 100 do
     local random_string = ""
     local length = math.random(1, 12)
@@ -14,3 +16,4 @@ for i = 1, 100 do
     end
     chatgames.register_question("Write Out Random", "Write out the text '" .. random_string .. "'", random_string, true)
 end
+--]]

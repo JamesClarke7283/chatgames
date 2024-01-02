@@ -15,10 +15,14 @@ end
 
 function chatgames.answer_func(game_name, player_name, attempt_str, time_given_in_seconds, time_used, question_id_selected)
     local question_data = chatgames.games[game_name].questions[question_id_selected]
-    local answer = question_data.answer
+    
+    -- Trim the answer and attempt, and convert to lower case if not case sensitive
+    local answer = question_data.is_case_sensitive and question_data.answer or question_data.answer:lower():match("^%s*(.-)%s*$")
+    local player_attempt = question_data.is_case_sensitive and attempt_str or attempt_str:lower():match("^%s*(.-)%s*$")
+    
     local player = minetest.get_player_by_name(player_name)
 
-    if answer == attempt_str then
+    if answer == player_attempt then
         local reward = chatgames.calculate_reward(time_given_in_seconds, time_given_in_seconds - time_used)
         emeraldbank.add_emeralds(player, reward)
         return true
@@ -26,6 +30,8 @@ function chatgames.answer_func(game_name, player_name, attempt_str, time_given_i
         return false
     end
 end
+
+
 
 local modpath = minetest.get_modpath("chatgames")
 local src_path = modpath .. "/src/"
