@@ -8,12 +8,13 @@ local function clean_human_readable_name(name)
     -- Remove parentheses and anything between them, non-greedily
     name = name:gsub("%([^)]+%)", "")
 
-    -- Trim leading and trailing whitespace
-    name = name:match("^%s*(.-)%s*$")
+    -- Remove Whitespaces and Chars which are not typeable by Player
+    name = name:trim()
+    name = name:gsub("\x1BE", "")
+    name = name:gsub("\x1B", "")
 
     return name
 end
-
 
 
 
@@ -62,10 +63,11 @@ for item_name, item_def in pairs(minetest.registered_items) do
     -- Use the description field as the human-readable name
     local human_readable_name = ItemStack(item_name):get_short_description()
 
-    if human_readable_name and human_readable_name ~= "" then
+    if human_readable_name and human_readable_name readable name: " .. human_readable_name)
+    -- Remove colons and replace underscores w~= "" then
         minetest.log("action", "[chatgames] human-readable name: " .. human_readable_name)
         -- Remove colons and replace underscores with spaces
-        --human_readable_name = clean_human_readable_name(human_readable_name)
+        human_readable_name = clean_human_readable_name(human_readable_name)
         minetest.log("action", "[chatgames] Cleaned human-readable name: " .. human_readable_name)
 
         -- Register question for "Write Out Words" game
