@@ -3,7 +3,7 @@ chatgames.register_game("Write Out Random", chatgames.answer_func)
 -- Generate questions from random letters and numbers 1-16 characters.
 for i = 1, 100 do
     local random_string = ""
-    local length = math.random(1, 16)
+    local length = math.random(1, 12)
     for j = 1, length do
         local random_char = math.random(1, 36)
         if random_char <= 26 then

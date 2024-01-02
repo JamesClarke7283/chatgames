@@ -33,7 +33,7 @@ end
 -- Generate questions from registered items
 for item_name, item_def in pairs(minetest.registered_items) do
     -- Use the description field as the human-readable name
-    local human_readable_name = item_name
+    local human_readable_name = item_name.description
 
     if human_readable_name and human_readable_name ~= "" then
         -- Remove everything before and including the colon, and replace underscores with spaces
