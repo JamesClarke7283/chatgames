@@ -65,10 +65,10 @@ for item_name, item_def in pairs(minetest.registered_items) do
 
     if human_readable_name and human_readable_name and human_readable_name then
     -- Remove colons and replace underscores w~= "" then
-        minetest.log("action", "[chatgames] human-readable name: " .. human_readable_name)
+        --minetest.log("action", "[chatgames] human-readable name: " .. human_readable_name)
         -- Remove colons and replace underscores with spaces
         human_readable_name = clean_human_readable_name(human_readable_name)
-        minetest.log("action", "[chatgames] Cleaned human-readable name: " .. human_readable_name)
+        --minetest.log("action", "[chatgames] Cleaned human-readable name: " .. human_readable_name)
 
         -- Register question for "Write Out Words" game
         chatgames.register_question("Write Out Words", "Write out the words '" .. human_readable_name .. "'", human_readable_name, false)
