@@ -63,7 +63,7 @@ for item_name, item_def in pairs(minetest.registered_items) do
     -- Use the description field as the human-readable name
     local human_readable_name = ItemStack(item_name):get_short_description()
 
-    if human_readable_name and human_readable_name readable name: " .. human_readable_name)
+    if human_readable_name and human_readable_name readable name: " .. human_readable_name) then
     -- Remove colons and replace underscores w~= "" then
         minetest.log("action", "[chatgames] human-readable name: " .. human_readable_name)
         -- Remove colons and replace underscores with spaces
