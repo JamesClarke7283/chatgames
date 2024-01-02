@@ -12,5 +12,5 @@ for i = 1, 100 do
             random_string = random_string .. tostring(random_char - 26)
         end
     end
-    chatgames.register_question("Write Out Random", "Write out the text '" .. random_string .. "'", random_string, false)
+    chatgames.register_question("Write Out Random", "Write out the text '" .. random_string .. "'", random_string, true)
 end

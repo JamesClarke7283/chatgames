@@ -1,0 +1,135 @@
+The following are the relevant source code files:
+
+// /home/impulse/Projects/Lua/minetest_mods/chatgames/init.lua
+-- Example answer function
+function chatgames.calculate_reward(time_given_in_seconds, time_left_in_seconds)
+    if time_given_in_seconds <= 0 then
+        return 0 -- Avoid division by zero
+    end
+
+    local time_used = time_given_in_seconds - time_left_in_seconds
+    local speed_ratio = time_used / time_given_in_seconds
+
+    -- Calculate reward, adjust the multiplier to scale the reward
+    local reward = (1 - speed_ratio) * 10
+
+    return math.floor(reward) -- Ensure the reward is a whole number
+end
+
+function chatgames.answer_func(game_name, player_name, attempt_str, time_given_in_seconds, time_used, question_id_selected)
+    local question_data = chatgames.games[game_name].questions[question_id_selected]
+    local answer = question_data.answer
+    local player = minetest.get_player_by_name(player_name)
+
+    if answer == attempt_str then
+        local reward = chatgames.calculate_reward(time_given_in_seconds, time_given_in_seconds - time_used)
+        emeraldbank.add_emeralds(player, reward)
+        return true
+    else
+        return false
+    end
+end
+
+local modpath = minetest.get_modpath("chatgames")
+local src_path = modpath .. "/src/"
+dofile(src_path .. "scramble_and_write_out_words.lua")
+dofile(src_path .. "write_out_random.lua")
+
+// /home/impulse/Projects/Lua/minetest_mods/chatgames/src/write_out_random.lua
+chatgames.register_game("Write Out Random", chatgames.answer_func)
+
+-- Generate questions from random letters and numbers 1-16 characters.
+for i = 1, 100 do
+    local random_string = ""
+    local length = math.random(1, 12)
+    for j = 1, length do
+        local random_char = math.random(1, 36)
+        if random_char <= 26 then
+            random_string = random_string .. string.char(random_char + 96)
+        else
+            random_string = random_string .. tostring(random_char - 26)
+        end
+    end
+    chatgames.register_question("Write Out Random", "Write out the text '" .. random_string .. "'", random_string, false)
+end
+
+// /home/impulse/Projects/Lua/minetest_mods/chatgames/src/scramble_and_write_out_words.lua
+local function clean_human_readable_name(name)
+    -- Remove colons and anything before it
+    name = name:gsub(".*:", "")
+
+    -- Replace underscores with spaces
+    name = name:gsub("_", " ")
+
+    -- Remove parentheses and anything between them, being careful not to remove the following character
+    name = name:gsub("%b()", "")
+
+    -- Trim leading and trailing whitespace
+    name = name:match("^%s*(.-)%s*$")
+
+    return name
+end
+
+
+chatgames.register_game("Unscramble", chatgames.answer_func)
+chatgames.register_game("Write Out Words", chatgames.answer_func)
+-- Scramble function
+-- Scramble function
+local function scramble(str)
+    local words = {}
+    for word in str:gmatch("%S+") do
+        -- Convert each word to title case
+        word = word:sub(1,1):upper() .. word:sub(2):lower()
+
+        -- Convert the word into a table of characters
+        local chars = {}
+        for char in word:gmatch(".") do
+            table.insert(chars, char)
+        end
+
+        -- Scramble the characters in the word with fewer swaps
+        local swap_times = math.floor(#chars / 2) -- Limiting the number of swaps
+        for _ = 1, swap_times do
+            local i = math.random(#chars)
+            local j = math.random(#chars)
+            chars[i], chars[j] = chars[j], chars[i]
+        end
+
+        -- Reassemble the word and add it to the list
+        words[#words + 1] = table.concat(chars)
+    end
+
+    -- Return the scrambled sentence
+    return table.concat(words, " ")
+end
+
+-- Generate questions from registered items
+for item_name, item_def in pairs(minetest.registered_items) do
+    -- Use the description field as the human-readable name
+    local human_readable_name = item_def.description
+    minetest.log("action", "[chatgames] human-readable name: " .. human_readable_name)
+
+
+    if human_readable_name and human_readable_name ~= "" then
+        -- Remove colons and replace underscores with spaces
+        human_readable_name = clean_human_readable_name(human_readable_name)
+        minetest.log("action", "[chatgames] Cleaned human-readable name: " .. human_readable_name)
+
+        -- Register question for "Write Out Words" game
+        chatgames.register_question("Write Out Words", "Write out the words '" .. human_readable_name .. "'", human_readable_name, true)
+        
+        -- Scramble the human-readable name
+        local scrambled_name = scramble(human_readable_name)
+
+        -- Register the question for "Unscramble" game
+        chatgames.register_question("Unscramble", "Unscramble the text '" .. scrambled_name .. "'", human_readable_name, true)
+    end
+end
+
+
+
+The following are the instructions for the project:
+
+// /home/impulse/Projects/Lua/minetest_mods/chatgames/README.md
+
+

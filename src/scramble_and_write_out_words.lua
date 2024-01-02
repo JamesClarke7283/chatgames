@@ -1,3 +1,22 @@
+local function clean_human_readable_name(name)
+    -- Remove colons and anything before it
+    name = name:gsub(".-:", "")
+
+    -- Replace underscores with spaces
+    name = name:gsub("_", " ")
+
+    -- Remove parentheses and anything between them, non-greedily
+    name = name:gsub("%([^)]+%)", "")
+
+    -- Trim leading and trailing whitespace
+    name = name:match("^%s*(.-)%s*$")
+
+    return name
+end
+
+
+
+
 chatgames.register_game("Unscramble", chatgames.answer_func)
 chatgames.register_game("Write Out Words", chatgames.answer_func)
 -- Scramble function
@@ -33,11 +52,14 @@ end
 -- Generate questions from registered items
 for item_name, item_def in pairs(minetest.registered_items) do
     -- Use the description field as the human-readable name
-    local human_readable_name = item_name.description
+    local human_readable_name = item_def.description
+    minetest.log("action", "[chatgames] human-readable name: " .. human_readable_name)
+
 
     if human_readable_name and human_readable_name ~= "" then
-        -- Remove everything before and including the colon, and replace underscores with spaces
-        human_readable_name = human_readable_name:gsub(".*:", ""):gsub("_", " ")
+        -- Remove colons and replace underscores with spaces
+        human_readable_name = clean_human_readable_name(human_readable_name)
+        minetest.log("action", "[chatgames] Cleaned human-readable name: " .. human_readable_name)
 
         -- Register question for "Write Out Words" game
         chatgames.register_question("Write Out Words", "Write out the words '" .. human_readable_name .. "'", human_readable_name, false)
